@@ -1,8 +1,9 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic_models import QueryInput, QueryResponse, DocumentInfo, DeleteFileRequest
-from langchain_utils_simple import get_rag_chain, get_response_from_query
+from langchain_utils import get_rag_chain
 from db_utils import insert_application_logs, get_chat_history, get_all_documents, insert_document_record, delete_document_record
+from chroma_utils import index_document_to_chroma, delete_doc_from_chroma
 from chroma_utils import index_document_to_chroma, delete_doc_from_chroma
 import os
 import uuid
@@ -80,9 +81,12 @@ def chat(query_input: QueryInput):
 
     try:
         chat_history = get_chat_history(session_id)
-        rag_chain = get_rag_chain(model_name=query_input.model.value)
+        rag_chain = get_rag_chain(query_input.model.value)
         
-        answer = get_response_from_query(rag_chain, query_input.question)
+        answer = rag_chain.invoke({
+            "input": query_input.question,
+            "chat_history": chat_history
+        })['answer']
         
         insert_application_logs(session_id, query_input.question, answer, query_input.model.value)
         logging.info(f"Session ID: {session_id}, AI Response: {answer}")
