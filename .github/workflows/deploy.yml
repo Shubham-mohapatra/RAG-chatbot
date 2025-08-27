@@ -1,0 +1,63 @@
+name: Deploy RAG Chatbot
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Test backend
+      run: |
+        python -m pytest test_*.py -v
+        
+    # Add your deployment steps here based on chosen platform
+    # Example for Railway:
+    # - name: Deploy to Railway
+    #   uses: railway-deploy@v1
+    #   with:
+    #     railway_token: ${{ secrets.RAILWAY_TOKEN }}
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
+        
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm run build
+        
+    # Add your deployment steps here
+    # Example for Vercel:
+    # - name: Deploy to Vercel
+    #   uses: vercel/action@v1
+    #   with:
+    #     vercel-token: ${{ secrets.VERCEL_TOKEN }}

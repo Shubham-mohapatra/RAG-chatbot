@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  rag-chatbot:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - HOST=0.0.0.0
+      - PORT=8000
+    volumes:
+      - ./uploads:/app/uploads
+      - ./chroma_db:/app/chroma_db
+      - ./rag_app.db:/app/rag_app.db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

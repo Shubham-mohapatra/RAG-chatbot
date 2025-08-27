@@ -1,0 +1,17 @@
+langchain
+langchain-google-genai
+langchain-core
+langchain_community
+langchain-huggingface
+sentence-transformers
+docx2txt
+pypdf
+langchain_chroma
+python-multipart
+fastapi
+uvicorn
+python-dotenv
+scikit-learn
+requests
+pytest
+pytest-asyncio
