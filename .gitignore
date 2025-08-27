@@ -13,6 +13,16 @@ venv.bak/
 
 # Environment variables
 .env
+
+# Local files
+*.log
+*.db
+chroma_db/
+uploads/
+
+# Railway/Render deployment files (keep in git for deployment)
+# Procfile
+# runtime.txt
 .env.local
 .env.production
 
