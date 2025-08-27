@@ -1,6 +1,6 @@
 # RAG Chatbot with Gemini AI
 
-A production-ready Retrieval-Augmented Generation (RAG) chatbot using Google Gemini AI, ChromaDB, and free embeddings.
+A production-ready Retrieval-Augmented Generation (RAG) chatbot using Google Gemini AI, ChromaDB, and Sentence Transformers for embeddings.
 
 ## 🚀 Features
 
@@ -84,7 +84,7 @@ curl -X POST "http://localhost:8000/chat" \
 ## 🔧 Configuration
 
 - **Embedding Model:** TF-IDF (free, offline)
-- **LLM Model:** Google Gemini 1.5 Flash
+- **LLM Model:** Google Gemini 2.5 Flash
 - **Vector Store:** ChromaDB with persistent storage
 - **Chunk Size:** 1000 characters with 200 overlap
 - **Max Retrieval:** 2 most relevant documents per query
@@ -112,13 +112,6 @@ All activities are logged to `app.log` including:
 - System errors and warnings
 - Performance metrics
 
-## 🚦 Status
-
-✅ **Production Ready** - Fully functional RAG chatbot
-✅ **Free Embeddings** - No OpenAI API costs
-✅ **Gemini Integration** - High-quality responses
-✅ **Error Handling** - Robust fallback mechanisms
-✅ **Auto-reload** - Development-friendly server
 
 ## 🔧 Troubleshooting
 
