@@ -8,16 +8,21 @@ services:
       mkdir -p uploads
       mkdir -p chroma_db
       mkdir -p vectors
-      python -m pip install --upgrade pip wheel setuptools==65.5.1
-      # Print Python version for debugging
+      # Print Python version
       python --version
-      # Install numpy first and explicitly to avoid version conflicts
-      python -m pip install numpy==1.24.3
+      # Use system packages to help with build
+      pip install --upgrade pip
       # Install minimal dependencies
-      python -m pip install -r requirements-minimal.txt
+      pip install -r requirements-minimal.txt || (echo "Failed to install from requirements-minimal.txt, falling back to direct installation" && \
+      pip install fastapi==0.104.1 uvicorn==0.22.0 python-multipart==0.0.6 sqlalchemy==2.0.23 python-dotenv==1.0.0 google-generativeai==0.3.2)
       # Print installed packages for debugging
       pip list
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    startCommand: |
+      if [ -f main.py ]; then
+        uvicorn main:app --host 0.0.0.0 --port $PORT
+      else
+        uvicorn main_minimal:app --host 0.0.0.0 --port $PORT
+      fi
     envVars:
       - key: GOOGLE_API_KEY
         sync: false 
