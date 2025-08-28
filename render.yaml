@@ -5,8 +5,10 @@ services:
     runtime: python
     plan: free
     buildCommand: |
-      chmod +x build_no_rust.sh
-      ./build_no_rust.sh
+      mkdir -p uploads
+      mkdir -p chroma_db
+      pip install numpy==1.24.3
+      pip install -r requirements-simple.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: GOOGLE_API_KEY
