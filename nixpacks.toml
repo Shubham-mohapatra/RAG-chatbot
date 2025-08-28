@@ -1,0 +1,22 @@
+[providers]
+python = "3.11"
+
+[variables]
+PYTHONUNBUFFERED = "1"
+PIP_NO_CACHE_DIR = "1"
+LANGCHAIN_TRACING_V2 = "false"
+
+[phases.install]
+dependsOn = ["setup"]
+cmds = [
+    "pip install --upgrade pip",
+    "pip install pydantic==2.5.0",
+    "pip install fastapi uvicorn python-dotenv python-multipart sqlalchemy",
+    "pip install google-generativeai==0.3.2",
+    "pip install langsmith==0.0.66",
+    "pip install langchain-core==0.1.10",
+    "pip install langchain-google-genai==0.0.8"
+]
+
+[start]
+cmd = "uvicorn main:app --host 0.0.0.0 --port $PORT"
