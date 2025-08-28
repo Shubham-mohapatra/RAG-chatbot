@@ -1,0 +1,10 @@
+# Absolute minimal requirements needed to run the app
+# Install these in this exact order to avoid version conflicts
+numpy==1.24.3
+fastapi==0.104.1
+uvicorn==0.24.0
+python-multipart==0.0.6
+sqlalchemy==2.0.23
+python-dotenv==1.0.0
+google-generativeai==0.3.2
+pydantic==1.10.8
