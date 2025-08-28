@@ -18,5 +18,5 @@ langchain-community==0.0.16
 # ChromaDB with specific version that has pre-built wheels
 chromadb==0.4.6
 
-# Supporting packages
-sentence-transformers==2.2.2
+# Supporting packages - use latest available version
+sentence-transformers==4.0.2

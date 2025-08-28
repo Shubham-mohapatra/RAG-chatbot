@@ -7,8 +7,10 @@ from typing import List, Optional
 
 # Attempt to import chromadb
 try:
-    from langchain_community.vectorstores import Chroma
-    from langchain_community.embeddings import SentenceTransformerEmbeddings
+    import chromadb
+    from sentence_transformers import SentenceTransformer
+    from langchain.vectorstores import Chroma
+    from langchain.embeddings import HuggingFaceEmbeddings
     logging.info("Successfully imported ChromaDB and embeddings")
 except ImportError as e:
     logging.error(f"Failed to import ChromaDB: {e}")
@@ -25,7 +27,10 @@ def get_vector_store():
     
     try:
         # Create embeddings
-        embeddings = SentenceTransformerEmbeddings(model_name=EMBEDDING_MODEL)
+        embeddings = HuggingFaceEmbeddings(
+            model_name=EMBEDDING_MODEL,
+            model_kwargs={'device': 'cpu'}
+        )
         
         # Create or load the vector store
         if not os.path.exists(CHROMA_PATH):
