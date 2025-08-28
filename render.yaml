@@ -1,0 +1,27 @@
+services:
+  # Backend service
+  - type: web
+    name: rag-chatbot-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GOOGLE_API_KEY
+        sync: false # This will prompt you to enter the API key in Render dashboard
+    autoDeploy: true
+
+  # Frontend service
+  - type: web
+    name: rag-chatbot-frontend
+    runtime: node
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npm start
+    envVars:
+      - key: NEXT_PUBLIC_API_BASE_URL
+        fromService:
+          type: web
+          name: rag-chatbot-backend
+          envVarKey: RENDER_EXTERNAL_URL
+    autoDeploy: true
