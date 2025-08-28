@@ -11,4 +11,4 @@ services:
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: GOOGLE_API_KEY
-        value: AIzaSyAWbpX4hG-poqt334TB_xHuKLj4_2cyTJg
+        sync: false 
