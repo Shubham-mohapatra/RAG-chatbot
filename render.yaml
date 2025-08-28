@@ -4,11 +4,11 @@ services:
     name: rag-chatbot-backend
     runtime: python
     plan: free
-    buildCommand: pip install -r requirements.txt
+    buildCommand: chmod +x build.sh && ./build.sh
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: GOOGLE_API_KEY
-        sync: false # This will prompt you to enter the API key in Render dashboard
+        value: AIzaSyDQFWo3fAkpIyV-Ky1idK_zKFepFYajGmk
     autoDeploy: true
 
   # Frontend service
