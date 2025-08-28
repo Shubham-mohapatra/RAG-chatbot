@@ -5,10 +5,10 @@ services:
     runtime: python
     plan: free
     buildCommand: chmod +x build.sh && ./build.sh
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    startCommand: chmod +x start.sh && ./start.sh
     envVars:
       - key: GOOGLE_API_KEY
-        value: AIzaSyDQFWo3fAkpIyV-Ky1idK_zKFepFYajGmk
+        sync: false # Will prompt during deployment - NEVER commit actual key values
     autoDeploy: true
 
   # Frontend service
