@@ -8,11 +8,13 @@ services:
       mkdir -p uploads
       mkdir -p chroma_db
       mkdir -p vectors
-      pip install --upgrade pip wheel setuptools
+      python -m pip install --upgrade pip wheel setuptools==65.5.1
+      # Print Python version for debugging
+      python --version
       # Install numpy first and explicitly to avoid version conflicts
-      pip install numpy==1.24.3
-      # Install rest of dependencies
-      pip install -r requirements-simple.txt
+      python -m pip install numpy==1.24.3
+      # Install minimal dependencies
+      python -m pip install -r requirements-minimal.txt
       # Print installed packages for debugging
       pip list
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
