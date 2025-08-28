@@ -12,17 +12,16 @@ services:
       python --version
       # Use system packages to help with build
       pip install --upgrade pip
-      # Install minimal dependencies
-      pip install -r requirements-minimal.txt || (echo "Failed to install from requirements-minimal.txt, falling back to direct installation" && \
-      pip install fastapi==0.104.1 uvicorn==0.22.0 python-multipart==0.0.6 sqlalchemy==2.0.23 python-dotenv==1.0.0 google-generativeai==0.3.2)
+      # Install minimal dependencies first
+      pip install -r requirements-minimal.txt
+      # Install additional dependencies for main.py
+      pip install langchain-google-genai==0.0.6 || echo "Failed to install langchain-google-genai"
+      # Create a simple script to determine which app to run
+      echo "cp main_minimal.py main_app.py" > choose_app.sh
+      chmod +x choose_app.sh
       # Print installed packages for debugging
       pip list
-    startCommand: |
-      if [ -f main.py ]; then
-        uvicorn main:app --host 0.0.0.0 --port $PORT
-      else
-        uvicorn main_minimal:app --host 0.0.0.0 --port $PORT
-      fi
+    startCommand: uvicorn main_minimal:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: GOOGLE_API_KEY
         sync: false 
