@@ -15,7 +15,12 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-logging.basicConfig(filename='app.log', level=logging.INFO)
+DATA_DIR = os.getenv("DATA_DIR", ".")
+os.makedirs(DATA_DIR, exist_ok=True)
+LOG_PATH = os.path.join(DATA_DIR, 'app.log')
+UPLOADS_DIR = os.path.join(DATA_DIR, 'uploads')
+os.makedirs(UPLOADS_DIR, exist_ok=True)
+logging.basicConfig(filename=LOG_PATH, level=logging.INFO)
 
 
 app = FastAPI(
@@ -132,7 +137,7 @@ def upload_document(file: UploadFile = File(...)):
             )
         
         # Create uploads directory if it doesn't exist
-        upload_dir = "uploads"
+        upload_dir = UPLOADS_DIR
         os.makedirs(upload_dir, exist_ok=True)
         
         # Save the uploaded file

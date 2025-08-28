@@ -85,8 +85,11 @@ def get_vector_store():
     
     try:
         embedding_function = get_embedding_function()
+        data_dir = os.getenv("DATA_DIR", ".")
+        persist_dir = os.path.join(data_dir, "chroma_db")
+        os.makedirs(persist_dir, exist_ok=True)
         vectorstore = Chroma(
-            persist_directory="./chroma_db", 
+            persist_directory=persist_dir, 
             embedding_function=embedding_function
         )
         print("✅ ChromaDB vectorstore initialized successfully!")
