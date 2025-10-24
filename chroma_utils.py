@@ -73,7 +73,7 @@ def get_embedding_function():
     
     # Use simple TF-IDF embeddings for reliability
     _embedding_function = SimpleTfidfEmbeddings()
-    print("✅ TF-IDF embeddings initialized successfully!")
+    print(" TF-IDF embeddings initialized successfully!")
     return _embedding_function
 
 def get_vector_store():
@@ -92,10 +92,10 @@ def get_vector_store():
             persist_directory=persist_dir, 
             embedding_function=embedding_function
         )
-        print("✅ ChromaDB vectorstore initialized successfully!")
+        print("ChromaDB vectorstore initialized successfully!")
         return vectorstore
     except Exception as e:
-        print(f"❌ Error initializing vectorstore: {e}")
+        print(f" Error initializing vectorstore: {e}")
         raise
 
 def load_and_split_document(file_path: str) -> List[Document]:
@@ -131,10 +131,10 @@ def index_document_to_chroma(file_path: str, file_id: int) -> bool:
             })
         
         vectorstore.add_documents(splits)
-        print(f"✅ Successfully indexed {filename} with {len(splits)} chunks")
+        print(f"Successfully indexed {filename} with {len(splits)} chunks")
         return True
     except Exception as e:
-        print(f"❌ Error indexing document: {e}")
+        print(f" Error indexing document: {e}")
         return False
 
 def delete_doc_from_chroma(file_id: int) -> bool:
@@ -150,14 +150,14 @@ def delete_doc_from_chroma(file_id: int) -> bool:
             
             # Delete using the IDs
             vectorstore.delete(ids=docs['ids'])
-            print(f"✅ Successfully deleted all documents with file_id {file_id}")
+            print(f" Successfully deleted all documents with file_id {file_id}")
             return True
         else:
-            print(f"⚠️ No documents found for file_id {file_id}")
+            print(f"No documents found for file_id {file_id}")
             return False
             
     except Exception as e:
-        print(f"❌ Error deleting document with file_id {file_id} from Chroma: {str(e)}")
+        print(f" Error deleting document with file_id {file_id} from Chroma: {str(e)}")
         return False
 
 def search_vectorstore(collection, query: str, n_results: int = 4):
@@ -179,11 +179,11 @@ def search_vectorstore(collection, query: str, n_results: int = 4):
             'distances': [distances]
         }
         
-        print(f"✅ Search returned {len(documents)} results")
+        print(f"Search returned {len(documents)} results")
         return formatted_results
         
     except Exception as e:
-        print(f"❌ Error searching vectorstore: {e}")
+        print(f"Error searching vectorstore: {e}")
         return {'documents': [[]], 'metadatas': [[]], 'distances': [[]]}
 
 # For compatibility with existing code
@@ -193,5 +193,5 @@ def extract_text_from_file(file_path: str) -> str:
         splits = load_and_split_document(file_path)
         return "\n\n".join([doc.page_content for doc in splits])
     except Exception as e:
-        print(f"❌ Error extracting text from {file_path}: {e}")
+        print(f"Error extracting text from {file_path}: {e}")
         raise
