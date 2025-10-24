@@ -37,11 +37,10 @@ app.add_middleware(
         "http://127.0.0.1:3000", 
         "http://localhost:3001", 
         "http://127.0.0.1:3001",
-        "https://*.vercel.app",  # Vercel deployments
-        "https://*.netlify.app", 
-        "https://*.railway.app",
-        "https://rag-chatbot-frontend-bjj8.onrender.com",  # Your frontend
-        "*"  
+        "https://rag-chatbot-frontend-bjj8.onrender.com",  # Your deployed frontend
+        "https://*.vercel.app",
+        "https://*.netlify.app",
+        "*"  # Allow all for now (remove in production)
     ],
     allow_credentials=True,
     allow_methods=["*"],
