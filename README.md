@@ -2,6 +2,12 @@
 
 A production-ready Retrieval-Augmented Generation (RAG) chatbot using Google Gemini AI, ChromaDB, and Sentence Transformers for embeddings.
 
+## 🌐 Live Demo
+
+- **Frontend:** [https://rag-chatbot-frontend-bjj8.onrender.com](https://rag-chatbot-frontend-bjj8.onrender.com)
+- **Backend API:** [https://rag-chatbot-backend-iwdg.onrender.com](https://rag-chatbot-backend-iwdg.onrender.com)
+- **API Docs:** [https://rag-chatbot-backend-iwdg.onrender.com/docs](https://rag-chatbot-backend-iwdg.onrender.com/docs)
+
 ## 🚀 Features
 
 - **Google Gemini AI Integration** - Uses gemini-1.5-flash for accurate responses
