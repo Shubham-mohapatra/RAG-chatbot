@@ -4,20 +4,19 @@ python-multipart==0.0.6
 sqlalchemy==2.0.23
 python-dotenv==1.0.0
 
-# Core dependencies - install in order
+# Core dependencies
 numpy==1.24.3
 pydantic==1.10.8
 
-# LangChain ecosystem - use versions that work together
-langsmith==0.0.87
-langchain-core==0.1.23
-langchain==0.1.0
-langchain-community==0.0.16
-langchain-google-genai==0.0.11
+# LangChain ecosystem - newer compatible versions
+langchain==0.1.20
+langchain-core==0.1.52
+langchain-community==0.0.38
+langchain-google-genai==1.0.0
 langchain-chroma==0.1.0
 
 # Google AI
-google-generativeai==0.4.1
+google-generativeai==0.5.0
 
 # Vector store
 chromadb==0.4.15
