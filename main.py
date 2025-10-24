@@ -39,7 +39,8 @@ app.add_middleware(
         "http://127.0.0.1:3001",
         "https://*.vercel.app",  # Vercel deployments
         "https://*.netlify.app", 
-        "https://*.railway.app", 
+        "https://*.railway.app",
+        "https://*.onrender.com",  # Render deployments
         "*"  
     ],
     allow_credentials=True,
