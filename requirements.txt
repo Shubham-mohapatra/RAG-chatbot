@@ -2,16 +2,23 @@ fastapi==0.104.1
 uvicorn==0.24.0
 python-multipart==0.0.6
 sqlalchemy==2.0.23
-google-generativeai==0.4.1
 python-dotenv==1.0.0
-# Explicitly install numpy first to avoid version conflicts
+
+# Core dependencies - install in order
 numpy==1.24.3
-# Use compatible versions of langchain packages
-langchain==0.1.0
-langchain-core==0.1.28
-langchain-community==0.0.16
-langchain-google-genai==0.0.11
-langchain-text-splitters==0.0.1
 pydantic==1.10.8
+
+# LangChain ecosystem - compatible versions
+langsmith==0.1.0
+langchain-core==0.1.28
+langchain==0.1.0
+langchain-community==0.0.16
+langchain-text-splitters==0.0.1
+langchain-google-genai==0.0.11
+
+# Google AI
+google-generativeai==0.4.1
+
+# Vector store
 chromadb==0.4.15
 sentence-transformers==2.2.2
