@@ -40,7 +40,7 @@ app.add_middleware(
         "https://*.vercel.app",  # Vercel deployments
         "https://*.netlify.app", 
         "https://*.railway.app",
-        "https://*.onrender.com",  # Render deployments
+        "https://rag-chatbot-frontend-bjj8.onrender.com",  # Your frontend
         "*"  
     ],
     allow_credentials=True,
