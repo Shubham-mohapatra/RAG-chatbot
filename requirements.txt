@@ -8,11 +8,11 @@ python-dotenv==1.0.0
 numpy==1.24.3
 pydantic==1.10.8
 
-# LangChain ecosystem - newer compatible versions
+# LangChain ecosystem - compatible versions that ACTUALLY EXIST
 langchain==0.1.20
 langchain-core==0.1.52
 langchain-community==0.0.38
-langchain-google-genai==1.0.0
+langchain-google-genai==1.0.10
 langchain-chroma==0.1.0
 
 # Google AI
