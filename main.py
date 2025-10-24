@@ -34,13 +34,10 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000", 
-        "http://127.0.0.1:3000", 
-        "http://localhost:3001", 
-        "http://127.0.0.1:3001",
+        "http://127.0.0.1:3000",
         "https://rag-chatbot-frontend-bjj8.onrender.com",  # Your deployed frontend
-        "https://*.vercel.app",
-        "https://*.netlify.app",
-        "*"  # Allow all for now (remove in production)
+        "https://www.smartdocs.com",  # Your custom domain
+        "https://smartdocs.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],
