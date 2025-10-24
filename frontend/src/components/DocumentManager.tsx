@@ -22,16 +22,33 @@ interface DocumentManagerProps {
 export default function DocumentManager({ onDocumentChange, detailed = false }: DocumentManagerProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadStatus, setUploadStatus] = useState<string>('')
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [dragActive, setDragActive] = useState(false)
   const [documents, setDocuments] = useState<DocumentInfo[]>([])
   const [isLoadingDocs, setIsLoadingDocs] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [toasts, setToasts] = useState<Array<{ id: number; message: string; type: 'success' | 'error' | 'info' }>>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const toastIdRef = useRef(0)
 
   React.useEffect(() => {
     if (detailed) {
       loadDocuments()
     }
   }, [detailed])
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    const id = ++toastIdRef.current
+    setToasts(prev => [...prev, { id, message, type }])
+    
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id))
+    }, type === 'error' ? 5000 : 3000)
+  }
+
+  const removeToast = (id: number) => {
+    setToasts(prev => prev.filter(t => t.id !== id))
+  }
 
   const loadDocuments = async () => {
     setIsLoadingDocs(true)

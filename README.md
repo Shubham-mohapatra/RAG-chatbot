@@ -120,6 +120,44 @@ All activities are logged to `app.log` including:
 3. **Poor responses:** Upload more relevant documents
 4. **Memory issues:** Reduce chunk size in `chroma_utils.py`
 
+## 🚀 Deployment
+
+### Quick Deploy (Recommended)
+
+**Backend:** Railway or Render (Free tier)
+**Frontend:** Vercel (Free tier)
+
+📚 **See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment guide**
+
+### Quick Start Deployment
+
+```bash
+# Test deployment readiness
+.\test-deployment.ps1
+
+# Deploy backend (Railway CLI)
+railway login
+railway init
+railway up
+
+# Deploy frontend (Vercel CLI)
+cd frontend
+vercel --prod
+```
+
+### Deployment Platforms
+
+| Platform | Backend | Frontend | Time | Cost |
+|----------|---------|----------|------|------|
+| **Railway + Vercel** | ✅ | ✅ | 15 min | Free-$5 |
+| **Render + Vercel** | ✅ | ✅ | 15 min | Free |
+| **Docker (VPS)** | ✅ | ✅ | 30 min | $5-10 |
+| **Google Cloud Run** | ✅ | ✅ | 30 min | $2-5 |
+
+📖 Detailed guides available in:
+- [DEPLOYMENT.md](./DEPLOYMENT.md) - Full deployment guide
+- [frontend/DEPLOY.md](./frontend/DEPLOY.md) - Frontend-specific guide
+
 ---
 
 **Built with:** FastAPI, LangChain, ChromaDB, Google Gemini AI, and ❤️

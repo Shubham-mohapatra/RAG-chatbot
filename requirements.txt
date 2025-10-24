@@ -7,9 +7,10 @@ python-dotenv==1.0.0
 # Explicitly install numpy first to avoid version conflicts
 numpy==1.24.3
 # Use older versions of langchain that are compatible with numpy<2
-langchain==0.0.267
-langchain-core==0.0.13
-langchain-google-genai==0.0.6
+langchain==0.1.0
+langchain-core==0.1.23
+langchain-community==0.0.16
+langchain-google-genai==0.0.11
 pydantic==1.10.8
 chromadb==0.4.15
 sentence-transformers==2.2.2

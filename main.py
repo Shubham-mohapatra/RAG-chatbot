@@ -38,9 +38,9 @@ app.add_middleware(
         "http://localhost:3001", 
         "http://127.0.0.1:3001",
         "https://*.vercel.app",  # Vercel deployments
-        "https://*.netlify.app", # Netlify deployments
-        "https://*.railway.app", # Railway deployments
-        "*"  # Allow all origins for public deployment (use cautiously)
+        "https://*.netlify.app", 
+        "https://*.railway.app", 
+        "*"  
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -195,4 +195,6 @@ def delete_document(request: DeleteFileRequest):
 if __name__ == "__main__":
     import uvicorn
     print("Starting RAG Chatbot server...")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = 8080  # Changed from 8000 to avoid conflicts
+    print(f"Server will run on port {port}")
+    uvicorn.run(app, host="0.0.0.0", port=port)

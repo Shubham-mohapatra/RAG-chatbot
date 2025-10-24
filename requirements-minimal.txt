@@ -1,8 +1,0 @@
-# Absolute minimal requirements with no compilation needed
-fastapi==0.104.1
-uvicorn==0.22.0
-python-multipart==0.0.6
-sqlalchemy==2.0.23
-python-dotenv==1.0.0
-google-generativeai==0.3.2
-pydantic==2.11.7
