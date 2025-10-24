@@ -1,23 +1,24 @@
-fastapi==0.104.1
-uvicorn==0.24.0
-python-multipart==0.0.6
-sqlalchemy==2.0.23
-python-dotenv==1.0.0
+# FastAPI Backend
+fastapi>=0.104.0
+uvicorn>=0.24.0
+python-multipart>=0.0.6
+sqlalchemy>=2.0.0
+python-dotenv>=1.0.0
 
-# Core dependencies
-numpy==1.24.3
-pydantic==1.10.8
+s
+numpy<2.0.0,>=1.24.0
+pydantic<2.0.0,>=1.10.0
 
-# LangChain ecosystem - compatible versions that ACTUALLY EXIST
-langchain==0.1.20
-langchain-core==0.1.52
-langchain-community==0.0.38
-langchain-google-genai==1.0.10
-langchain-chroma==0.1.0
+# LangChain ecosystem - let pip resolve compatible versions
+langchain
+langchain-core
+langchain-community
+langchain-google-genai
+langchain-chroma
 
 # Google AI
-google-generativeai==0.7.2
+google-generativeai
 
 # Vector store
-chromadb==0.4.15
-sentence-transformers==2.2.2
+chromadb>=0.4.0
+sentence-transformers>=2.2.0
