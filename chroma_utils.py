@@ -21,7 +21,7 @@ vectorstore = None
 _embedding_function = None
 _sentence_transformer_model = None  # Lazy-loaded model
 
-def get_sentence_transformer_model(model_name="all-MiniLM-L6-v2"):
+def get_sentence_transformer_model(model_name="paraphrase-MiniLM-L3-v2"):
     """
     Lazy load Sentence Transformer model only when needed.
     This prevents model loading at startup, reducing memory usage and startup time.

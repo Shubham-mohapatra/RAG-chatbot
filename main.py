@@ -63,7 +63,7 @@ def health_check():
         return {
             "status": "healthy",
             "vector_store": "connected",
-            "embeddings": "sentence-transformers (all-MiniLM-L6-v2)",
+            "embeddings": "sentence-transformers (paraphrase-MiniLM-L3-v2)",
             "embedding_dimensions": 384,
             "timestamp": str(datetime.now())
         }
