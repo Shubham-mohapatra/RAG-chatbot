@@ -57,7 +57,8 @@ def health_check():
         return {
             "status": "healthy",
             "vector_store": "connected",
-            "embeddings": "initialized",
+            "embeddings": "sentence-transformers (all-MiniLM-L6-v2)",
+            "embedding_dimensions": 384,
             "timestamp": str(datetime.now())
         }
     except Exception as e:

@@ -13,6 +13,7 @@ import {
   Loader2
 } from '@/components/ui/icons'
 import { chatAPI, type DocumentInfo } from '@/lib/api'
+import LottieLoader from '@/components/ui/lottie-loader'
 
 interface DocumentManagerProps {
   onDocumentChange: () => void
@@ -190,7 +191,7 @@ export default function DocumentManager({ onDocumentChange, detailed = false }: 
         
         <div className="flex flex-col items-center gap-2">
           {isUploading ? (
-            <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+            <LottieLoader size={80} text={uploadStatus || 'Processing document...'} />
           ) : (
             <Upload className="h-8 w-8 text-gray-400" />
           )}

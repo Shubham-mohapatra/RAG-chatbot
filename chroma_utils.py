@@ -4,8 +4,14 @@ from langchain_chroma import Chroma
 from typing import List
 from langchain_core.documents import Document
 import os
-import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
+
+# Sentence Transformers import
+try:
+    from sentence_transformers import SentenceTransformer
+    SENTENCE_TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    SENTENCE_TRANSFORMERS_AVAILABLE = False
+    print(" sentence-transformers not available, will use basic embeddings")
 
 # Text splitter configuration
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200, length_function=len)
@@ -14,67 +20,75 @@ text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=20
 vectorstore = None
 _embedding_function = None
 
-class SimpleTfidfEmbeddings:
-    """Simple TF-IDF based embeddings that work offline"""
-    def __init__(self):
-        self.vectorizer = TfidfVectorizer(
-            max_features=384,
-            stop_words='english',
-            ngram_range=(1, 2),
-            min_df=1
+class SentenceTransformerEmbeddings:
+    """Custom wrapper for Sentence Transformers"""
+    def __init__(self, model_name="all-MiniLM-L6-v2"):
+        print(f"🚀 Loading Sentence Transformer model: {model_name}...")
+        import torch
+        # Use CPU and optimize memory
+        self.model = SentenceTransformer(
+            model_name,
+            device='cpu',
+            cache_folder='./models'
         )
-        self.fitted = False
-        self.dimension = 384
-    
-    def _ensure_fitted(self, texts):
-        """Ensure the vectorizer is fitted"""
-        if not self.fitted and texts:
-            self.vectorizer.fit(texts)
-            self.fitted = True
+        # Reduce memory footprint
+        if hasattr(self.model, 'half'):
+            try:
+                self.model = self.model.half()  # Use FP16 to save memory
+            except:
+                pass  # Keep FP32 if half precision fails
+        print(f" Model loaded! Embedding dimension: {self.model.get_sentence_embedding_dimension()}")
     
     def embed_documents(self, texts):
-        """Embed multiple documents"""
-        if not texts:
-            return []
-        
-        self._ensure_fitted(texts)
-        
-        try:
-            vectors = self.vectorizer.transform(texts)
-            dense_vectors = vectors.toarray()
-            
-            # Pad or truncate to fixed dimension
-            result = []
-            for vector in dense_vectors:
-                if len(vector) < self.dimension:
-                    padded = np.zeros(self.dimension)
-                    padded[:len(vector)] = vector
-                    result.append(padded.tolist())
-                else:
-                    result.append(vector[:self.dimension].tolist())
-            
-            return result
-        except Exception as e:
-            print(f"Error in embed_documents: {e}")
-            return [[0.0] * self.dimension for _ in texts]
+        """Embed a list of documents"""
+        import torch
+        with torch.no_grad():  # Disable gradient computation to save memory
+            embeddings = self.model.encode(
+                texts,
+                normalize_embeddings=True,
+                show_progress_bar=False,
+                batch_size=8,  # Smaller batch size to reduce memory
+                convert_to_numpy=True
+            )
+        return embeddings.tolist()
     
     def embed_query(self, text):
         """Embed a single query"""
-        return self.embed_documents([text])[0]
+        import torch
+        with torch.no_grad():
+            embedding = self.model.encode(
+                [text],
+                normalize_embeddings=True,
+                show_progress_bar=False,
+                convert_to_numpy=True
+            )[0]
+        return embedding.tolist()
 
 def get_embedding_function():
-    """Get embedding function for ChromaDB"""
+    """
+    Get embedding function for ChromaDB using Sentence Transformers.
+    Uses 'all-MiniLM-L6-v2' model which provides excellent semantic understanding
+    while being fast and efficient (384 dimensions, ~80MB model).
+    """
     global _embedding_function
     
     if _embedding_function is not None:
         return _embedding_function
     
-    print("Initializing embeddings...")
+    print(" Initializing Sentence Transformer embeddings...")
+    print("   Model: all-MiniLM-L6-v2 (384 dimensions)")
     
-    # Use simple TF-IDF embeddings for reliability
-    _embedding_function = SimpleTfidfEmbeddings()
-    print(" TF-IDF embeddings initialized successfully!")
-    return _embedding_function
+    if not SENTENCE_TRANSFORMERS_AVAILABLE:
+        raise ImportError("sentence-transformers package not installed. Run: pip install sentence-transformers")
+    
+    try:
+        _embedding_function = SentenceTransformerEmbeddings("all-MiniLM-L6-v2")
+        print(" Sentence Transformer embeddings initialized successfully!")
+        print("   Benefits: Semantic search, context understanding, better retrieval")
+        return _embedding_function
+    except Exception as e:
+        print(f" Error initializing Sentence Transformers: {e}")
+        raise
 
 def get_vector_store():
     """Initialize and return the vectorstore"""

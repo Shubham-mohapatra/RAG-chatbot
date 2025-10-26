@@ -10,13 +10,14 @@ A production-ready Retrieval-Augmented Generation (RAG) chatbot using Google Gem
 
 ## 🚀 Features
 
-- **Google Gemini AI Integration** - Uses gemini-1.5-flash for accurate responses
-- **Free TF-IDF Embeddings** - No costly OpenAI API dependencies 
+- **Google Gemini AI Integration** - Uses gemini-1.5-flash and gemini-2.0-flash-exp for accurate responses
+- **Semantic Search with Sentence Transformers** - Advanced semantic understanding using all-MiniLM-L6-v2 embeddings (384 dimensions)
 - **ChromaDB Vector Store** - Persistent document storage and retrieval
 - **Multi-format Support** - Upload PDF, DOCX, and HTML documents
 - **Chat History** - Maintains conversation context across sessions
 - **FastAPI Backend** - RESTful API with automatic documentation
 - **Real-time Logging** - Comprehensive activity tracking
+- **Smart Document Chunking** - Intelligent text splitting for optimal retrieval
 
 ## 📁 Project Structure
 

@@ -21,6 +21,7 @@ import {
 import { chatAPI, type ChatMessage, type DocumentInfo, type ChatResponse } from '@/lib/api'
 import DocumentManager from '@/components/DocumentManager'
 import SimpleMarkdown from '@/components/SimpleMarkdown'
+import LottieLoader from '@/components/ui/lottie-loader'
 
 interface Message {
   id: string
@@ -372,36 +373,12 @@ export default function HomePage() {
                       <span className="text-sm font-medium text-gray-700">
                         {selectedModel.includes('2.0') ? 'Gemini 2.5 Flash' : 'Gemini 1.5 Flash'}
                       </span>
-                      <div className="ml-auto">
-                        <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                      </div>
                     </div>
                     
-                    {/* Loading Content */}
+                    {/* Loading Content with Lottie Animation */}
                     <div className="px-4 py-6">
-                      <div className="flex items-center gap-3">
-                        <div className="flex space-x-1">
-                          <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-bounce"></div>
-                          <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-bounce delay-100"></div>
-                          <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-bounce delay-200"></div>
-                        </div>
-                        <div className="space-y-1">
-                          <div className="text-sm font-medium text-gray-700">AI is analyzing your documents...</div>
-                          <div className="text-xs text-gray-500">Processing with advanced AI capabilities</div>
-                        </div>
-                      </div>
-                      
-                      {/* Loading Animation Bars */}
-                      <div className="mt-4 space-y-2">
-                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-pulse w-3/4"></div>
-                        </div>
-                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-pulse w-1/2 delay-75"></div>
-                        </div>
-                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-pulse w-2/3 delay-150"></div>
-                        </div>
+                      <div className="flex flex-col items-center gap-3">
+                        <LottieLoader size={120} text="AI is analyzing your documents..." />
                       </div>
                     </div>
                   </CardContent>
