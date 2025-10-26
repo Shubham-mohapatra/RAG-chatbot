@@ -35,9 +35,9 @@ class ChromaRetriever(BaseRetriever):
 try:
     vectorstore = get_vector_store()
     retriever = ChromaRetriever(vectorstore=vectorstore, k=8)  # Retrieve more documents for better context
-    print("✅ Retriever initialized successfully!")
+    print(" Retriever initialized successfully!")
 except Exception as e:
-    print(f"❌ Warning: Could not initialize retriever: {e}")
+    print(f" Warning: Could not initialize retriever: {e}")
     # Create a dummy retriever that properly inherits from BaseRetriever
     class DummyRetriever(BaseRetriever):
         class Config:

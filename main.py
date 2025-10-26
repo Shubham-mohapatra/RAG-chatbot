@@ -15,6 +15,11 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+# Silence warnings
+os.environ['ANONYMIZED_TELEMETRY'] = 'False'  # Disable ChromaDB telemetry
+import warnings
+warnings.filterwarnings('ignore', category=UserWarning)
+
 DATA_DIR = os.getenv("DATA_DIR", ".")
 os.makedirs(DATA_DIR, exist_ok=True)
 LOG_PATH = os.path.join(DATA_DIR, 'app.log')
@@ -45,6 +50,7 @@ app.add_middleware(
 )
 
 @app.get("/")
+@app.head("/")  # Support HEAD requests for health checks
 def read_root():
     return {"message": "Welcome to RAG Chatbot API! Visit /docs for API documentation."}
 
