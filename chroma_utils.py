@@ -19,28 +19,61 @@ text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=20
 # Global variables for lazy initialization
 vectorstore = None
 _embedding_function = None
+_sentence_transformer_model = None  # Lazy-loaded model
 
-class SentenceTransformerEmbeddings:
-    """Custom wrapper for Sentence Transformers"""
-    def __init__(self, model_name="all-MiniLM-L6-v2"):
-        print(f"🚀 Loading Sentence Transformer model: {model_name}...")
+def get_sentence_transformer_model(model_name="all-MiniLM-L6-v2"):
+    """
+    Lazy load Sentence Transformer model only when needed.
+    This prevents model loading at startup, reducing memory usage and startup time.
+    """
+    global _sentence_transformer_model
+    
+    if _sentence_transformer_model is not None:
+        return _sentence_transformer_model
+    
+    print(f"⚡ Lazy loading Sentence Transformer model: {model_name}...")
+    
+    try:
         import torch
         # Use CPU and optimize memory
-        self.model = SentenceTransformer(
+        _sentence_transformer_model = SentenceTransformer(
             model_name,
             device='cpu',
             cache_folder='./models'
         )
-        # Reduce memory footprint
-        if hasattr(self.model, 'half'):
+        
+        # Reduce memory footprint with half precision if available
+        if hasattr(_sentence_transformer_model, 'half'):
             try:
-                self.model = self.model.half()  # Use FP16 to save memory
+                _sentence_transformer_model = _sentence_transformer_model.half()
+                print("  Using FP16 (half precision) to save memory")
             except:
-                pass  # Keep FP32 if half precision fails
-        print(f" Model loaded! Embedding dimension: {self.model.get_sentence_embedding_dimension()}")
+                print("  Using FP32 (full precision)")
+        
+        print(f"✅ Model loaded! Dimension: {_sentence_transformer_model.get_sentence_embedding_dimension()}")
+        return _sentence_transformer_model
+    except Exception as e:
+        print(f"❌ Error loading model: {e}")
+        raise
+
+class SentenceTransformerEmbeddings:
+    """
+    Custom wrapper for Sentence Transformers with lazy loading.
+    Model is only loaded when embed_documents() or embed_query() is first called.
+    """
+    def __init__(self, model_name="all-MiniLM-L6-v2"):
+        self.model_name = model_name
+        self._model = None  # Model not loaded yet
+    
+    @property
+    def model(self):
+        """Lazy load model on first access"""
+        if self._model is None:
+            self._model = get_sentence_transformer_model(self.model_name)
+        return self._model
     
     def embed_documents(self, texts):
-        """Embed a list of documents"""
+        """Embed a list of documents (lazy loads model on first call)"""
         import torch
         with torch.no_grad():  # Disable gradient computation to save memory
             embeddings = self.model.encode(
@@ -66,28 +99,33 @@ class SentenceTransformerEmbeddings:
 
 def get_embedding_function():
     """
-    Get embedding function for ChromaDB using Sentence Transformers.
+    Get embedding function for ChromaDB using Sentence Transformers with lazy loading.
     Uses 'all-MiniLM-L6-v2' model which provides excellent semantic understanding
     while being fast and efficient (384 dimensions, ~80MB model).
+    
+    Model is NOT loaded at startup - it's loaded only when first needed.
+    This reduces memory usage and startup time, perfect for Render deployment.
     """
     global _embedding_function
     
     if _embedding_function is not None:
         return _embedding_function
     
-    print(" Initializing Sentence Transformer embeddings...")
+    print("⚡ Initializing Sentence Transformer embeddings (lazy loading enabled)...")
     print("   Model: all-MiniLM-L6-v2 (384 dimensions)")
+    print("   Note: Model will load when first embedding is requested")
     
     if not SENTENCE_TRANSFORMERS_AVAILABLE:
         raise ImportError("sentence-transformers package not installed. Run: pip install sentence-transformers")
     
     try:
+        # Create wrapper but don't load model yet
         _embedding_function = SentenceTransformerEmbeddings("all-MiniLM-L6-v2")
-        print(" Sentence Transformer embeddings initialized successfully!")
-        print("   Benefits: Semantic search, context understanding, better retrieval")
+        print("✅ Embedding function ready (model will lazy load on first use)")
+        print("   Benefits: Semantic search, context understanding, lower memory at startup")
         return _embedding_function
     except Exception as e:
-        print(f" Error initializing Sentence Transformers: {e}")
+        print(f"❌ Error initializing Sentence Transformers: {e}")
         raise
 
 def get_vector_store():
