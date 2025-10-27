@@ -21,10 +21,11 @@ vectorstore = None
 _embedding_function = None
 _sentence_transformer_model = None  # Lazy-loaded model
 
-def get_sentence_transformer_model(model_name="paraphrase-MiniLM-L3-v2"):
+def get_sentence_transformer_model(model_name="all-MiniLM-L12-v2"):
     """
     Lazy load Sentence Transformer model only when needed.
     This prevents model loading at startup, reducing memory usage and startup time.
+    Uses all-MiniLM-L12-v2: smaller model (33MB) optimized for low memory environments.
     """
     global _sentence_transformer_model
     
@@ -35,6 +36,9 @@ def get_sentence_transformer_model(model_name="paraphrase-MiniLM-L3-v2"):
     
     try:
         import torch
+        import gc
+        
+        # Aggressive memory optimization for Render free tier
         # Use CPU and optimize memory
         _sentence_transformer_model = SentenceTransformer(
             model_name,
@@ -42,15 +46,26 @@ def get_sentence_transformer_model(model_name="paraphrase-MiniLM-L3-v2"):
             cache_folder='./models'
         )
         
-        # Reduce memory footprint with half precision if available
+        # Set to eval mode to disable training features (saves memory)
+        _sentence_transformer_model.eval()
+        
+        # Disable gradient computation permanently (saves significant memory)
+        for param in _sentence_transformer_model.parameters():
+            param.requires_grad = False
+        
+        # Reduce memory footprint with half precision
         if hasattr(_sentence_transformer_model, 'half'):
             try:
                 _sentence_transformer_model = _sentence_transformer_model.half()
-                print("  Using FP16 (half precision) to save memory")
+                print("  ✓ Using FP16 (half precision) to save memory")
             except:
-                print("  Using FP32 (full precision)")
+                print("  ✓ Using FP32 (full precision)")
         
-        print(f"✅ Model loaded! Dimension: {_sentence_transformer_model.get_sentence_embedding_dimension()}")
+        # Force garbage collection
+        gc.collect()
+        
+        print(f" Model loaded! Dimension: {_sentence_transformer_model.get_sentence_embedding_dimension()}")
+        print(f"Memory optimizations: eval mode, gradients disabled, FP16")
         return _sentence_transformer_model
     except Exception as e:
         print(f"❌ Error loading model: {e}")
@@ -111,9 +126,9 @@ def get_embedding_function():
     if _embedding_function is not None:
         return _embedding_function
     
-    print("⚡ Initializing Sentence Transformer embeddings (lazy loading enabled)...")
-    print("   Model: all-MiniLM-L6-v2 (384 dimensions)")
-    print("   Note: Model will load when first embedding is requested")
+    print(" Initializing Sentence Transformer embeddings (lazy loading enabled)...")
+    print("  Model: all-MiniLM-L6-v2 (384 dimensions)")
+    print(" Note: Model will load when first embedding is requested")
     
     if not SENTENCE_TRANSFORMERS_AVAILABLE:
         raise ImportError("sentence-transformers package not installed. Run: pip install sentence-transformers")
@@ -121,11 +136,11 @@ def get_embedding_function():
     try:
         # Create wrapper but don't load model yet
         _embedding_function = SentenceTransformerEmbeddings("all-MiniLM-L6-v2")
-        print("✅ Embedding function ready (model will lazy load on first use)")
+        print(" Embedding function ready (model will lazy load on first use)")
         print("   Benefits: Semantic search, context understanding, lower memory at startup")
         return _embedding_function
     except Exception as e:
-        print(f"❌ Error initializing Sentence Transformers: {e}")
+        print(f" Error initializing Sentence Transformers: {e}")
         raise
 
 def get_vector_store():
