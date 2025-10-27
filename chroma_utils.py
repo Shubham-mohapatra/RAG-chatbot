@@ -4,14 +4,8 @@ from langchain_chroma import Chroma
 from typing import List
 from langchain_core.documents import Document
 import os
-
-# Sentence Transformers import
-try:
-    from sentence_transformers import SentenceTransformer
-    SENTENCE_TRANSFORMERS_AVAILABLE = True
-except ImportError:
-    SENTENCE_TRANSFORMERS_AVAILABLE = False
-    print(" sentence-transformers not available, will use basic embeddings")
+import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Text splitter configuration
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200, length_function=len)
@@ -19,129 +13,68 @@ text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=20
 # Global variables for lazy initialization
 vectorstore = None
 _embedding_function = None
-_sentence_transformer_model = None  # Lazy-loaded model
 
-def get_sentence_transformer_model(model_name="all-MiniLM-L12-v2"):
-    """
-    Lazy load Sentence Transformer model only when needed.
-    This prevents model loading at startup, reducing memory usage and startup time.
-    Uses all-MiniLM-L12-v2: smaller model (33MB) optimized for low memory environments.
-    """
-    global _sentence_transformer_model
-    
-    if _sentence_transformer_model is not None:
-        return _sentence_transformer_model
-    
-    print(f"⚡ Lazy loading Sentence Transformer model: {model_name}...")
-    
-    try:
-        import torch
-        import gc
-        
-        # Aggressive memory optimization for Render free tier
-        # Use CPU and optimize memory
-        _sentence_transformer_model = SentenceTransformer(
-            model_name,
-            device='cpu',
-            cache_folder='./models'
+class SimpleTfidfEmbeddings:
+    """Simple TF-IDF based embeddings that work offline"""
+    def __init__(self):
+        self.vectorizer = TfidfVectorizer(
+            max_features=384,
+            stop_words='english',
+            ngram_range=(1, 2),
+            min_df=1
         )
-        
-        # Set to eval mode to disable training features (saves memory)
-        _sentence_transformer_model.eval()
-        
-        # Disable gradient computation permanently (saves significant memory)
-        for param in _sentence_transformer_model.parameters():
-            param.requires_grad = False
-        
-        # Reduce memory footprint with half precision
-        if hasattr(_sentence_transformer_model, 'half'):
-            try:
-                _sentence_transformer_model = _sentence_transformer_model.half()
-                print("  ✓ Using FP16 (half precision) to save memory")
-            except:
-                print("  ✓ Using FP32 (full precision)")
-        
-        # Force garbage collection
-        gc.collect()
-        
-        print(f" Model loaded! Dimension: {_sentence_transformer_model.get_sentence_embedding_dimension()}")
-        print(f"Memory optimizations: eval mode, gradients disabled, FP16")
-        return _sentence_transformer_model
-    except Exception as e:
-        print(f"❌ Error loading model: {e}")
-        raise
-
-class SentenceTransformerEmbeddings:
-    """
-    Custom wrapper for Sentence Transformers with lazy loading.
-    Model is only loaded when embed_documents() or embed_query() is first called.
-    """
-    def __init__(self, model_name="all-MiniLM-L6-v2"):
-        self.model_name = model_name
-        self._model = None  # Model not loaded yet
+        self.fitted = False
+        self.dimension = 384
     
-    @property
-    def model(self):
-        """Lazy load model on first access"""
-        if self._model is None:
-            self._model = get_sentence_transformer_model(self.model_name)
-        return self._model
+    def _ensure_fitted(self, texts):
+        """Ensure the vectorizer is fitted"""
+        if not self.fitted and texts:
+            self.vectorizer.fit(texts)
+            self.fitted = True
     
     def embed_documents(self, texts):
-        """Embed a list of documents (lazy loads model on first call)"""
-        import torch
-        with torch.no_grad():  # Disable gradient computation to save memory
-            embeddings = self.model.encode(
-                texts,
-                normalize_embeddings=True,
-                show_progress_bar=False,
-                batch_size=8,  # Smaller batch size to reduce memory
-                convert_to_numpy=True
-            )
-        return embeddings.tolist()
+        """Embed multiple documents"""
+        if not texts:
+            return []
+        
+        self._ensure_fitted(texts)
+        
+        try:
+            vectors = self.vectorizer.transform(texts)
+            dense_vectors = vectors.toarray()
+            
+            # Pad or truncate to fixed dimension
+            result = []
+            for vector in dense_vectors:
+                if len(vector) < self.dimension:
+                    padded = np.zeros(self.dimension)
+                    padded[:len(vector)] = vector
+                    result.append(padded.tolist())
+                else:
+                    result.append(vector[:self.dimension].tolist())
+            
+            return result
+        except Exception as e:
+            print(f"Error in embed_documents: {e}")
+            return [[0.0] * self.dimension for _ in texts]
     
     def embed_query(self, text):
         """Embed a single query"""
-        import torch
-        with torch.no_grad():
-            embedding = self.model.encode(
-                [text],
-                normalize_embeddings=True,
-                show_progress_bar=False,
-                convert_to_numpy=True
-            )[0]
-        return embedding.tolist()
+        return self.embed_documents([text])[0]
 
 def get_embedding_function():
-    """
-    Get embedding function for ChromaDB using Sentence Transformers with lazy loading.
-    Uses 'all-MiniLM-L6-v2' model which provides excellent semantic understanding
-    while being fast and efficient (384 dimensions, ~80MB model).
-    
-    Model is NOT loaded at startup - it's loaded only when first needed.
-    This reduces memory usage and startup time, perfect for Render deployment.
-    """
+    """Get embedding function for ChromaDB"""
     global _embedding_function
     
     if _embedding_function is not None:
         return _embedding_function
     
-    print(" Initializing Sentence Transformer embeddings (lazy loading enabled)...")
-    print("  Model: all-MiniLM-L6-v2 (384 dimensions)")
-    print(" Note: Model will load when first embedding is requested")
+    print("Initializing embeddings...")
     
-    if not SENTENCE_TRANSFORMERS_AVAILABLE:
-        raise ImportError("sentence-transformers package not installed. Run: pip install sentence-transformers")
-    
-    try:
-        # Create wrapper but don't load model yet
-        _embedding_function = SentenceTransformerEmbeddings("all-MiniLM-L6-v2")
-        print(" Embedding function ready (model will lazy load on first use)")
-        print("   Benefits: Semantic search, context understanding, lower memory at startup")
-        return _embedding_function
-    except Exception as e:
-        print(f" Error initializing Sentence Transformers: {e}")
-        raise
+    # Use simple TF-IDF embeddings for reliability
+    _embedding_function = SimpleTfidfEmbeddings()
+    print(" TF-IDF embeddings initialized successfully!")
+    return _embedding_function
 
 def get_vector_store():
     """Initialize and return the vectorstore"""
